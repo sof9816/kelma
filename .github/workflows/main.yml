@@ -1,0 +1,70 @@
+name: CI
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+jobs:
+  build-android-web:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v2
+      - uses: actions/setup-java@v2
+        with:
+          distribution: "zulu"
+          java-version: "11"
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+      - run: flutter --version
+      - name: Running flutter pub
+        run: flutter pub get
+      - name: Running flutter test
+        run: flutter test
+      - name: Building for android apk & appbundle
+        run: |
+          flutter build apk
+          flutter build appbundle
+      # web
+      - name: Building for web
+        run: flutter build web
+  build-ios:
+    runs-on: macos-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v2
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "2.5.3"
+      - name: Running flutter pub
+        run: flutter pub get
+      - name: Running flutter test
+        run: flutter test
+      - name: Building for ios
+        run: flutter build ios --release --no-codesign
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v2
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: "beta"
+      - name: Config for desktop
+        run: flutter config --enable-windows-desktop
+      - name: Building for windows
+        run: flutter build windows
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v2
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: "beta"
+      - name: Config for desktop
+        run: flutter config --enable-macos-desktop
+      - name: Building for macos
+        run: flutter build macos
