@@ -10,6 +10,19 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  KeyboardController controller = KeyboardController();
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  typeLetter(String letter) {
+    controller.keyboardAction = (letter) {
+      typeLetter(letter);
+    };
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -18,9 +31,15 @@ class _HomeState extends State<Home> {
         child: Container(
           color: const Color(0xFFD9D9D9),
           child: Stack(
-            children: const [
-              Positioned(top: 150, left: 0, right: 0, child: TriesGrid()),
-              Positioned(bottom: 0, left: 0, right: 0, child: Keyboard()),
+            children: [
+              const Positioned(top: 150, left: 0, right: 0, child: TriesGrid()),
+              Positioned(
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  child: Keyboard(
+                    controller: controller,
+                  )),
             ],
           ),
         ),

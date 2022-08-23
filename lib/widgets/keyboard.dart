@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
+@immutable
 class Keyboard extends StatelessWidget {
-  const Keyboard({Key? key}) : super(key: key);
+  KeyboardController? controller;
+  Keyboard({Key? key, this.controller}) : super(key: key);
 
   final String letters =
       "ض0ص0ث0ق0ف0غ0ع0ه0خ0ح0ج0ش0س0ي0ب0ل0ا0ت0ن0م0ك0ة0ء0ظ0ط0ذ0د0ز0ر0و0ى";
@@ -13,6 +15,7 @@ class Keyboard extends StatelessWidget {
 
   Widget keyboardGrid(context) {
     double height = (MediaQuery.of(context).size.height / 4) + 20;
+    var lettersArray = letters.split("0");
     return Stack(
       children: [
         Container(
@@ -31,14 +34,17 @@ class Keyboard extends StatelessWidget {
                   childAspectRatio: 26 / 42,
                   crossAxisSpacing: 5,
                   mainAxisSpacing: 12),
-              itemCount: letters.split("0").length + 2,
+              itemCount: lettersArray.length + 2,
               itemBuilder: (BuildContext ctx, index) {
                 return GestureDetector(
                   onTap: () {
                     int newIndex = index + 1;
-                    int count = letters.split("0").length;
+                    int count = lettersArray.length;
                     if (newIndex == 23 || newIndex == count + 2) {
                       return;
+                    }
+                    if (controller?.keyboardAction != null) {
+                      controller?.keyboardAction!(lettersArray[newIndex]);
                     }
                   },
                   child: Container(
@@ -125,5 +131,15 @@ class Keyboard extends StatelessWidget {
       letter,
       style: Theme.of(context).textTheme.bodyText1!.copyWith(fontSize: 20),
     );
+  }
+}
+
+typedef KeyboardAction = Function(String value);
+
+class KeyboardController {
+  KeyboardAction? keyboardAction;
+
+  void dispose() {
+    keyboardAction = null;
   }
 }
