@@ -6,7 +6,7 @@ class Keyboard extends StatelessWidget {
   Keyboard({Key? key, this.controller}) : super(key: key);
 
   final String letters =
-      "ض0ص0ث0ق0ف0غ0ع0ه0خ0ح0ج0ش0س0ي0ب0ل0ا0ت0ن0م0ك0ة0ء0ظ0ط0ذ0د0ز0ر0و0ى";
+      "ض0ص0ث0ق0ف0غ0ع0ه0خ0ح0ج0ش0س0ي0ب0ل0ا0ت0ن0م0ك0ة0ظ0ط0ذ0د0ز0ر0و0ى";
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +16,7 @@ class Keyboard extends StatelessWidget {
   Widget keyboardGrid(context) {
     double height = (MediaQuery.of(context).size.height / 4) + 20;
     var lettersArray = letters.split("0");
-    return Stack(
+    return Column(
       children: [
         Container(
           height: height,
@@ -27,119 +27,120 @@ class Keyboard extends StatelessWidget {
                 topRight: Radius.circular(height / 15)),
           ),
           child: GridView.builder(
-              padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
-              gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                  maxCrossAxisExtent: 26,
-                  mainAxisExtent: 42,
-                  childAspectRatio: 26 / 42,
-                  crossAxisSpacing: 5,
-                  mainAxisSpacing: 12),
-              itemCount: lettersArray.length + 2,
+              padding: const EdgeInsets.fromLTRB(10, 15, 15, 0),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 10,
+                mainAxisSpacing: 5,
+                crossAxisSpacing: 5,
+              ),
+              itemCount: lettersArray.length,
               itemBuilder: (BuildContext ctx, index) {
-                return GestureDetector(
-                  onTap: () {
-                    int newIndex = index + 1;
-                    int count = lettersArray.length;
-                    if (newIndex == 23 || newIndex == count + 2) {
-                      return;
-                    }
-                    if (controller?.keyboardAction != null) {
-                      controller?.keyboardAction!(lettersArray[newIndex]);
-                    }
-                  },
+                var letter = lettersArray[index];
+                if (letter.isEmpty) return const SizedBox();
+                return Material(
+                  color: Colors.transparent,
                   child: Container(
-                    width: 29,
-                    height: 42,
-                    alignment: Alignment.center,
                     decoration: BoxDecoration(
-                        color: getColor(index),
-                        borderRadius: BorderRadius.circular(15)),
-                    child: letterWidget(context, index, letters),
+                      color: const Color.fromARGB(89, 217, 217, 217),
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    child: TextButton(
+                      style: ButtonStyle(
+                        padding: MaterialStateProperty.all<EdgeInsets>(
+                          const EdgeInsets.all(0),
+                        ),
+                      ),
+                      onPressed: () {
+                        if (controller?.typeAction != null) {
+                          controller?.typeAction!(letter);
+                        }
+                      },
+                      child: Text(
+                        letter,
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyText1!
+                            .copyWith(fontSize: 20),
+                      ),
+                    ),
                   ),
                 );
               }),
         ),
-        Positioned(bottom: 40, left: 5, child: enterButton()),
-        Positioned(bottom: 40, right: 5, child: removeButton())
+        Container(
+          color: Colors.black,
+          child: Row(
+            children: [
+              enterButton(),
+              removeButton(),
+            ],
+          ),
+        )
       ],
     );
   }
 
-  Color getColor(index) {
-    int newIndex = index + 1;
-    int count = letters.split("0").length;
-    if (newIndex == 23 || newIndex == count + 2) {
-      return Colors.black;
-    } else {
-      return const Color.fromARGB(89, 217, 217, 217);
-    }
-  }
-
   Widget enterButton() {
-    return Container(
-      width: 41,
-      height: 42,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-          color: const Color.fromARGB(89, 217, 217, 217),
-          borderRadius: BorderRadius.circular(22)),
-      child: IconButton(
-        onPressed: () {},
-        icon: const Icon(
-          Icons.keyboard_return_outlined,
-          color: Colors.white,
+    return Expanded(
+      child: Material(
+        color: Colors.transparent,
+        child: Container(
+          margin: const EdgeInsets.fromLTRB(40, 0, 40, 0),
+          height: 40,
+          decoration: BoxDecoration(
+              color: const Color.fromARGB(89, 217, 217, 217),
+              borderRadius: BorderRadius.circular(22)),
+          child: IconButton(
+            onPressed: () {
+              if (controller?.enterAction != null) {
+                controller?.enterAction!();
+              }
+            },
+            icon: const Icon(
+              Icons.keyboard_return_outlined,
+              color: Colors.white,
+            ),
+          ),
         ),
       ),
     );
   }
 
   Widget removeButton() {
-    return Container(
-      width: 41,
-      height: 42,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-          color: const Color.fromARGB(89, 217, 217, 217),
-          borderRadius: BorderRadius.circular(22)),
-      child: IconButton(
-        onPressed: () {},
-        icon: const Icon(
-          Icons.backspace_outlined,
-          color: Colors.white,
+    return Expanded(
+      child: Material(
+        color: Colors.transparent,
+        child: Container(
+          margin: const EdgeInsets.fromLTRB(40, 0, 40, 0),
+          height: 40,
+          decoration: BoxDecoration(
+              color: const Color.fromARGB(89, 217, 217, 217),
+              borderRadius: BorderRadius.circular(22)),
+          child: IconButton(
+            onPressed: () {
+              if (controller?.removeAction != null) {
+                controller?.removeAction!();
+              }
+            },
+            icon: const Icon(
+              Icons.backspace_outlined,
+              color: Colors.white,
+            ),
+          ),
         ),
       ),
     );
   }
-
-  Widget letterWidget(context, index, letters) {
-    int count = letters.split("0").length;
-    int newIndex = index + 1;
-    if (newIndex == 23) {
-      return const Text("");
-    }
-    if (newIndex == count + 2) {
-      return const Text("");
-    }
-    if (newIndex > 23 && newIndex < count + 2) {
-      return Text(
-        letters.split("0")[index - 1],
-        style: Theme.of(context).textTheme.bodyText1!.copyWith(fontSize: 20),
-      );
-    }
-    String letter = letters.split("0")[index];
-    return Text(
-      letter,
-      style: Theme.of(context).textTheme.bodyText1!.copyWith(fontSize: 20),
-    );
-  }
 }
 
-typedef KeyboardAction = Function(String value);
-
 class KeyboardController {
-  KeyboardAction? keyboardAction;
+  Function(String value)? typeAction;
+  Function()? removeAction;
+  Function()? enterAction;
 
   void dispose() {
-    keyboardAction = null;
+    typeAction = null;
+    removeAction = null;
+    enterAction = null;
   }
 }

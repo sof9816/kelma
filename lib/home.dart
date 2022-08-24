@@ -11,36 +11,51 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   KeyboardController controller = KeyboardController();
+  TriesController triesController = TriesController();
+  List<String> letters = List<String>.filled(30, "");
+  var letterIndex = 0;
 
   @override
   void initState() {
     super.initState();
+    controller.typeAction = (letter) {
+      typeLetter(letter);
+    };
+    controller.removeAction = () {
+      removeLetter();
+    };
+    controller.enterAction = () {};
+  }
+
+  removeLetter() {
+    if (letterIndex > 0) letterIndex--;
+    setState(() {
+      letters[letterIndex] = "";
+    });
   }
 
   typeLetter(String letter) {
-    controller.keyboardAction = (letter) {
-      typeLetter(letter);
-    };
+    setState(() {
+      letters[letterIndex] = letter;
+    });
+    if (letterIndex < letters.length - 1) letterIndex++;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(),
-      body: Center(
-        child: Container(
-          color: const Color(0xFFD9D9D9),
-          child: Stack(
-            children: [
-              const Positioned(top: 150, left: 0, right: 0, child: TriesGrid()),
-              Positioned(
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  child: Keyboard(
-                    controller: controller,
-                  )),
-            ],
+      body: SafeArea(
+        child: Center(
+          child: Container(
+            color: const Color(0xFFD9D9D9),
+            child: Column(
+              children: [
+                Expanded(
+                  child: TriesGrid(letters: letters),
+                ),
+                Keyboard(controller: controller),
+              ],
+            ),
           ),
         ),
       ),
